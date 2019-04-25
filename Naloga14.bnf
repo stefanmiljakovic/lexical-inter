@@ -1,0 +1,121 @@
+main ::= main_loop | main_loop main
+main_loop ::= struct | contract | contract_call
+
+// General
+character_letter ::= '[A-z]';
+character_number ::= '[0-9]';
+character_number_loop ::= character_number | character_number character_number_loop
+
+boolean ::= 'true' | 'false' // Regex Token
+number ::= character_number_loop '.' character_number_loop | character_number_loop // Regex Token
+string ::= 'any unicode' // Regex Token
+
+epsilon ::= // Imply epsilon
+
+operator_assign ::= '+=' | '-=' | '='
+operator_variable_duo ::= '+' | '-' | '*' | '/' | '==' | '!=' | '>=' | '<=' | '<' | '>'
+operator_variable_post ::= '++' | '--'
+
+/**
+    Variables can end with single number, but can't contain them in between
+    nor multiple for better syntax
+ */
+
+// Variable with or without type
+variable ::= variable_name | variable_typed
+
+// Variable value
+variable_value ::= boolean | number | string
+
+// Variable property
+variable_property_accessor ::= '.' variable_name | '.' variable_name variable_property_accessor
+variable_property ::= variable_name variable_property_accessor
+
+variable_name ::= variable_name_letter | variable_name_letter character_number // Regex Token
+variable_typed ::= variable_name variable_name // Can state type
+
+variable_name_letter ::= character_letter | character_letter variable_name_letter;
+
+/**
+    Calls
+ */
+
+call ::= '(' call_arguments ')'
+call_arguments ::= value_complex | value_complex ',' call_arguments
+
+property_call ::= variable_property call
+contract_call ::= 'call' variable_name call
+function_call ::= variable_name call
+
+any_call ::= property_call | contract_call | function_call
+
+
+// Has value
+value_simple ::= variable_name | variable_value | variable_property | any_call
+value_complex ::= value_simple | value_simple operator_variable_duo value_complex
+
+/**
+    Assignments to variable or property
+ */
+
+variable_operable ::= variable_name | variable_property
+
+variable_duo_operation ::= variable_operable operator_assign value_complex
+variable_single_operation ::= variable_operable operator_variable_post
+
+variable_operation ::= variable_duo_operation | variable_single_operation
+
+/**
+    Structure definition - Simple block embedded with list of available
+    variables.
+ */
+struct ::= 'Struct' variable_name struct_block
+struct_block ::= '{' struct_block_inner '}'
+struct_block_inner ::= variable_name | variable_name struct_block_inner
+
+/**
+    Function definition
+    Optional return type along with arguments and block body
+ */
+contract ::= 'Contract' variable_name contract_arguments contract_block
+contract_arguments ::= '(' contract_arguments_loop ')'
+contract_arguments_loop ::= variable | variable ',' contract_arguments_loop
+contract_block ::= '{' contract_block_inner '}'
+contract_block_inner ::= logic_block
+
+/**
+    Logic block, can contain:
+        calls to foreign functions,
+        assignment of values,
+        operations among values,
+        if statements
+ */
+
+logic_block ::= logic_operation ';' | logic_operation ';' logic_block
+logic_operation ::= any_call | variable_operation | if_block else_if_block else_block
+
+
+if_block ::= 'if' '(' value_complex ')' '{' logic_block '}'
+else_if_block ::= 'else' if_block | epsilon
+else_block ::= 'else' '{' logic_block '}' | epsilon
+
+/**
+
+Thought test - analysis
+
+Structure -
+
+Starts with Struct as followed by rule, employs variable name
+and contains {} along with variable_names.
+Covers until line 17
+
+Contract getPoints ->
+follows added variables in () followed by code block
+has if statement which receives complex value, in this case
+it applies rule game.state (property) == over (variable_name)
+contains another block which has another if followed by else (blocks)
+inside them there are
+    - variable_operable += valueable;
+followed by similar logic
+
+ */

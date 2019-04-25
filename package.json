@@ -1,0 +1,21 @@
+{
+  "name": "lexical",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "nodemon --exec node --inspect=5858 -r ts-node/register src/entry.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "chevrotain": "^4.3.3",
+    "express": "^4.16.4"
+  },
+  "devDependencies": {
+    "@types/express": "^4.16.1",
+    "ts-node": "^8.1.0",
+    "typescript": "^3.4.5"
+  }
+}

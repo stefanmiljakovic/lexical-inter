@@ -1,0 +1,66 @@
+Struct Player {
+	name
+	score
+	points
+	skins
+	trust
+}
+
+Struct Game {
+	state
+}
+
+Struct Skin {
+	price
+	color
+}
+
+
+Contract getPoints (player1, player2, game) {
+	if(game.state == 'over'){
+		if(player1.score > player2.score){
+			player1.score += 10;
+			player2.score -= 10;
+		}
+	else{
+		player2.score += 10;
+		player2.score = -10;
+		}
+	}
+}
+
+call getPoints('Stefan', 'Urska', game1)
+
+Contract buySkin (player, skin) {
+	if(player.points >= skin.price) {
+		player.points -= skin.price;
+		player.skins.push(skin);
+	}
+}
+
+Contract allowMove (currentGameState, promisedGameState, Player dispatcher) {
+	if(currentGameState.verifyLegality(promisedGameState)){
+		currentGameState.set(promisedGameState);
+		dispatcher.trust += 2;
+	}else {
+		dispatcher.trust -= 10;
+		delete promisedGameState;
+	}
+}
+
+Contract earnPoints (Game game, Player white, Player black) {
+	if(game.isFinished()){
+		let victor = game.getVictor();
+
+		if(victor == white){
+			white.points += normalize(black.points - white.points) * 0.01 + 4;
+			black.points -= normalize(white.points - black.points) * 0.01;
+		} else if (victor == black) {
+			black.points += normalize(white.points - black.points) * 0.01 + 4;
+			white.points -= normalize(black.points - white.points) * 0.01;
+		} else {
+			white.points += 5;
+			black.points += 5;
+		}
+	}
+}
