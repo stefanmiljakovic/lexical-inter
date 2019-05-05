@@ -17,19 +17,17 @@ Struct Skin {
 
 
 Contract getPoints (player1, player2, game) {
-	if(game.state == 'over'){
-		if(player1.score > player2.score){
+	if(game.state == 'over') {
+		if(player1.score > player2.score) {
 			player1.score += 10;
 			player2.score -= 10;
 		}
-	else{
-		player2.score += 10;
-		player2.score = -10;
+	    else {
+            player2.score += 10;
+            player2.score = -10;
 		}
 	}
 }
-
-call getPoints('Stefan', 'Urska', game1)
 
 Contract buySkin (player, skin) {
 	if(player.points >= skin.price) {
