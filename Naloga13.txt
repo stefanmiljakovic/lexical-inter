@@ -16,7 +16,7 @@ Struct Skin {
 }
 
 
-Contract getPoints (player1, player2, game) {
+Contract getPoints (Player player1, Player player2, Game game) {
 	if(game.state == 'over') {
 		if(player1.score > player2.score) {
 			player1.score += 10;
@@ -29,33 +29,30 @@ Contract getPoints (player1, player2, game) {
 	}
 }
 
-Contract buySkin (player, skin) {
+Contract buySkin (Player player, Skin skin) {
 	if(player.points >= skin.price) {
 		player.points -= skin.price;
 		player.skins.push(skin);
 	}
 }
 
-Contract allowMove (currentGameState, promisedGameState, Player dispatcher) {
+Contract allowMove (Game currentGameState, Game promisedGameState, Player dispatcher) {
 	if(currentGameState.verifyLegality(promisedGameState)){
-		currentGameState.set(promisedGameState);
+		currentGameState = promisedGameState;
 		dispatcher.trust += 2;
-	}else {
+	} else {
 		dispatcher.trust -= 10;
-		delete promisedGameState;
 	}
 }
 
 Contract earnPoints (Game game, Player white, Player black) {
-	if(game.isFinished()){
-		let victor = game.getVictor();
-
-		if(victor == white){
-			white.points += normalize(black.points - white.points) * 0.01 + 4;
-			black.points -= normalize(white.points - black.points) * 0.01;
-		} else if (victor == black) {
-			black.points += normalize(white.points - black.points) * 0.01 + 4;
-			white.points -= normalize(black.points - white.points) * 0.01;
+	if(game.state == 'over'){
+		if(game.victor == 'white'){
+			white.points += (black.points - white.points) * 0.01 + 4;
+			black.points -= (white.points - black.points) * 0.01;
+		} else if (game.victor == 'black') {
+			black.points += (white.points - black.points) * 0.01 + 4;
+			white.points -= (black.points - white.points) * 0.01;
 		} else {
 			white.points += 5;
 			black.points += 5;
